@@ -36896,9 +36896,9 @@ module.exports = "#define GLSLIFY 1\nuniform float time;\nuniform float position
 },{}],"js/shaders/vertex.glsl":[function(require,module,exports) {
 module.exports = "#define GLSLIFY 1\nuniform float time;\nvarying vec2 vUv;\nvarying vec4 vPosition;\nvarying vec3 vColor;\nvarying vec3 vNormal;\n\nuniform sampler2D texture;\nuniform vec2 pixels;\nuniform vec2 uvRate1;\n\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\nvec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}\nvec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}\n\nfloat snoise(vec3 v){ \n  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;\n  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);\n\n// First corner\n  vec3 i  = floor(v + dot(v, C.yyy) );\n  vec3 x0 =   v - i + dot(i, C.xxx) ;\n\n// Other corners\n  vec3 g = step(x0.yzx, x0.xyz);\n  vec3 l = 1.0 - g;\n  vec3 i1 = min( g.xyz, l.zxy );\n  vec3 i2 = max( g.xyz, l.zxy );\n\n  //  x0 = x0 - 0. + 0.0 * C \n  vec3 x1 = x0 - i1 + 1.0 * C.xxx;\n  vec3 x2 = x0 - i2 + 2.0 * C.xxx;\n  vec3 x3 = x0 - 1. + 3.0 * C.xxx;\n\n// Permutations\n  i = mod(i, 289.0 ); \n  vec4 p = permute( permute( permute( \n             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))\n           + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) \n           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));\n\n// Gradients\n// ( N*N points uniformly over a square, mapped onto an octahedron.)\n  float n_ = 1.0/7.0; // N=7\n  vec3  ns = n_ * D.wyz - D.xzx;\n\n  vec4 j = p - 49.0 * floor(p * ns.z *ns.z);  //  mod(p,N*N)\n\n  vec4 x_ = floor(j * ns.z);\n  vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)\n\n  vec4 x = x_ *ns.x + ns.yyyy;\n  vec4 y = y_ *ns.x + ns.yyyy;\n  vec4 h = 1.0 - abs(x) - abs(y);\n\n  vec4 b0 = vec4( x.xy, y.xy );\n  vec4 b1 = vec4( x.zw, y.zw );\n\n  vec4 s0 = floor(b0)*2.0 + 1.0;\n  vec4 s1 = floor(b1)*2.0 + 1.0;\n  vec4 sh = -step(h, vec4(0.0));\n\n  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;\n  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;\n\n  vec3 p0 = vec3(a0.xy,h.x);\n  vec3 p1 = vec3(a0.zw,h.y);\n  vec3 p2 = vec3(a1.xy,h.z);\n  vec3 p3 = vec3(a1.zw,h.w);\n\n//Normalise gradients\n  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n  p0 *= norm.x;\n  p1 *= norm.y;\n  p2 *= norm.z;\n  p3 *= norm.w;\n\n// Mix final noise value\n  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);\n  m = m * m;\n  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), \n                                dot(p2,x2), dot(p3,x3) ) );\n}\n\nvec3 hsv2rgb(vec3 c){\n    vec4 K = vec4(1.0, 2.0/ 3.0, 1.0 / 3.0, 3.0);\n    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\n    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\n}\n\nvoid main() {\n\n    float noise = snoise(position*50. + time/20.);\n\n    vec3 newposition = position * (noise + 0.4);\n\n    vColor = hsv2rgb(vec3(noise*0.1, 0.8, 0.8));\n\n    vNormal = normal;\n   \n    gl_Position = projectionMatrix * modelViewMatrix * vec4(newposition, 1.0);\n}\n\n// transition from big to small\n\n    // vec3 newposition = position*abs(sin(time/10.));\n";
 },{}],"js/shaders/fragmentParticles.glsl":[function(require,module,exports) {
-module.exports = "#define GLSLIFY 1\nuniform float time;\nuniform float position;\n\nuniform sampler2D texture1;\nuniform sampler2D texture2;\n\nuniform vec4 resolution;\nvarying vec2 vUv;\nvarying vec4 vPosition; \nvarying vec3 vColor;\nvarying vec3 vNormal;\n\nvoid main() {\n    gl_FragColor = vec4(1., 0.0, 0.0, 1.0);\n}";
+module.exports = "#define GLSLIFY 1\nuniform float time;\nuniform float position;\n\nuniform sampler2D texture1;\nuniform sampler2D texture2;\n\nuniform vec4 resolution;\nvarying vec2 vUv;\nvarying vec4 vPosition; \nvarying vec3 vColor;\nvarying vec3 vNormal;\n\nvoid main() {\n    gl_FragColor = vec4(0.899, 0.999, 0.999, 0.5);\n}";
 },{}],"js/shaders/vertexParticles.glsl":[function(require,module,exports) {
-module.exports = "#define GLSLIFY 1\nuniform float time;\n\nuniform sampler2D texture1;\nuniform sampler2D texture2;\n\nuniform vec4 resolution;\nvarying vec2 vUv;\nvarying vec4 vPosition; \nvarying vec3 vColor;\nvarying vec3 vNormal;\n\nvoid main() {\n    vUv = uv;\n\n    vec4 mvPosition = modelViewMatrix * vec4(position, 1.);\n    gl_PointSize = 10. * (.2 / - mvPosition.z);\n    gl_Position = projectionMatrix * mvPosition;\n}";
+module.exports = "#define GLSLIFY 1\nuniform float time;\n\nuniform sampler2D texture1;\nuniform sampler2D texture2;\n\nuniform vec4 resolution;\nvarying vec2 vUv;\nvarying vec4 vPosition; \nvarying vec3 vColor;\nvarying vec3 vNormal;\n\nvoid main() {\n    vUv = uv;\n\n    vec3 p = position;\n\n    p.y += 0.1*(sin(p.y*20. + time) * 0.5 + 0.5);\n    p.yz += 0.05*(sin(p.y*10. + time) * 0.5 + 0.5);\n\n    vec4 mvPosition = modelViewMatrix * vec4(p, 1.);\n    gl_PointSize = 3. * (.4 / - mvPosition.z);\n    gl_Position = projectionMatrix * mvPosition;\n}";
 },{}],"js/app.js":[function(require,module,exports) {
 "use strict";
 
@@ -36941,12 +36941,12 @@ var sketch = /*#__PURE__*/function () {
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
     this.camera = new THREE.PerspectiveCamera(70, this.width / this.height, 0.01, 10);
-    this.camera.position.z = 1;
+    this.camera.position.z = 2;
     this.renderer = new THREE.WebGLRenderer({
       antialias: true
     });
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setClearColor(0xffffff, 1);
+    this.renderer.setClearColor(0x000000, 1);
     this.renderer.physicallyCorrectLights = true;
     this.renderer.outputEncoding = THREE.sRGBEncoding;
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -37001,14 +37001,15 @@ var sketch = /*#__PURE__*/function () {
         side: THREE.DoubleSide // wireframe: true,
 
       });
-      this.geometry = new THREE.SphereBufferGeometry(0.3, 162, 162);
+      this.geometry = new THREE.SphereBufferGeometry(0.4, 162, 162);
       this.plane = new THREE.Mesh(this.geometry, this.material);
       this.scene.add(this.plane);
     }
   }, {
     key: "addParticles",
     value: function addParticles() {
-      var that = this;
+      var that = this; // this.particleGeometry = new THREE.SphereBufferGeometry(0.1, 162, 162);
+
       this.particleMaterial = new THREE.ShaderMaterial({
         extensions: {
           derivatives: "#extension GL_OES_standard_derivatives : enable"
@@ -37030,7 +37031,23 @@ var sketch = /*#__PURE__*/function () {
         side: THREE.DoubleSide // wireframe: true,
 
       });
-      this.particleGeometry = new THREE.SphereBufferGeometry(0.4, 162, 162);
+      var N = 8000;
+      var positions = new Float32Array(N * 3);
+      var redi = 0.7;
+      this.particleGeometry = new THREE.BufferGeometry();
+      var inc = Math.PI * (3 - Math.sqrt(5));
+      var off = 2 / N;
+
+      for (var i = 0; i < N; i++) {
+        var y = i * off - 1 + off / 2;
+        var r = Math.sqrt(1 - y * y);
+        var phi = i * inc;
+        positions[3 * i] = redi * Math.cos(phi) * r;
+        positions[3 * i + 1] = redi * y;
+        positions[3 * i + 2] = redi * Math.sin(phi) * r;
+      }
+
+      this.particleGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
       this.points = new THREE.Points(this.particleGeometry, this.particleMaterial);
       this.scene.add(this.points);
     }
@@ -37054,7 +37071,9 @@ var sketch = /*#__PURE__*/function () {
       this.time += 0.05; // this.mesh.rotation.x = this.time / 2000;
       // this.mesh.rotation.y = this.time / 1000;
 
+      this.points.rotation.y = this.time / 100;
       this.material.uniforms.time.value = this.time;
+      this.particleMaterial.uniforms.time.value = this.time;
       this.renderer.render(this.scene, this.camera);
       window.requestAnimationFrame(this.render.bind(this));
     }
@@ -37066,7 +37085,20 @@ var sketch = /*#__PURE__*/function () {
 exports.default = sketch;
 new sketch({
   dom: document.getElementById("container")
-});
+}); // funnel shape particles
+// let N = 1000;
+//     let positions = new Float32Array(N * 3);
+//     this.particleGeometry = new THREE.BufferGeometry();
+//     let inc = Math.PI * (3 - Math.sqrt(5));
+//     let off = 2 / N;
+//     for (let i = 0; i < N; i++) {
+//       let y = i * off - 1 + off / 2;
+//       let r = Math.sqrt(1 - y * y) - 2;
+//       let phi = i * inc;
+//       positions[3 * i] = Math.cos(phi) * r;
+//       positions[3 * i + 1] = y;
+//       positions[3 * i + 2] = Math.sin(phi) * r;
+//     }
 },{"three":"node_modules/three/build/three.module.js","three/examples/jsm/controls/OrbitControls.js":"node_modules/three/examples/jsm/controls/OrbitControls.js","./shaders/fragment":"js/shaders/fragment.glsl","./shaders/vertex":"js/shaders/vertex.glsl","./shaders/fragmentParticles":"js/shaders/fragmentParticles.glsl","./shaders/vertexParticles":"js/shaders/vertexParticles.glsl"}],"C:/Users/Rahul/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -37095,7 +37127,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62037" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56059" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
