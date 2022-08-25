@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import fragment from "./shaders/fragment";
-import vertex from "./shaders/vertex";
-import fragmentParticle from "./shaders/fragmentParticles";
-import vertexParticle from "./shaders/vertexParticles";
+import fragment from "./shaders/fragment.glsl";
+import vertex from "./shaders/vertex.glsl";
+import fragmentParticle from "./shaders/fragmentParticles.glsl";
+import vertexParticle from "./shaders/vertexParticles.glsl";
 
 export default class sketch {
   constructor(options) {
